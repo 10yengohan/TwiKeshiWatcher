@@ -1,4 +1,4 @@
-DeletedStatusLogger
+TwiKeshiWatcher
 ===================
 #概要
 ツイ消しした人に「ツイ消しを見た」とリプライをする。Rubyで書かれている。
