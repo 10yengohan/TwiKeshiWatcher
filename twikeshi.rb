@@ -30,16 +30,54 @@ Streaming_client = TweetStream::Client.new
 
 #ログを書く
 deleted = Logger.new("deleted.log")
+timeline = Logger.new("timeline.log")
 
 #稼働開始
 Streaming_client.on_inited do
   puts 'Connected successfully...'
 end
-
+tweets = Hash.new("none")
 #ツイ消しだ！
 Streaming_client.on_delete do |status_id, user_id|
   screen_name = REST_client.user(user_id).screen_name
-  deleted.info("DELETED: status_id: #{status_id}, user_id: #{user_id}, screen_name: #{screen_name}")
-  puts "DELETED: status_id: #{status_id}, user_id: #{user_id}, screen_name: #{screen_name}"
-  REST_client.update("@#{screen_name} ツイ消しを見た")
+  REST_client.update("ツ")
+  if tweets["#{status_id}"] != "none" then
+    puts "--- DELETED ---"
+    puts tweets["#{status_id}"].user.screen_name
+    puts tweets["#{status_id}"].user.id
+    puts tweets["#{status_id}"].id
+    puts tweets["#{status_id}"].text
+
+    deleted.info "--- DELETED ---"
+    deleted.info tweets["#{status_id}"].user.screen_name
+    deleted.info tweets["#{status_id}"].user.id
+    deleted.info tweets["#{status_id}"].id
+    deleted.info tweets["#{status_id}"].text
+  else
+    puts "--- DELETED ---"
+    puts screen_name
+    puts user_id
+    puts status_id
+    puts "text unknown"
+    
+    deleted.info "--- DELETED ---"
+    deleted.info screen_name
+    deleted.info user_id
+    deleted.info status_id
+    deleted.info "text unknown"
+  end
+  deleted.info("\n\n\n")
+end
+
+#タイムライン取得
+Streaming_client.userstream do |object|
+  puts "recieve a tweet / class: #{object.class}"
+  puts object.text
+  tweets["#{object.id}"] = object
+  timeline.info("STATUS: #{object.class}")
+  timeline.info("STATUS: #{object.user.screen_name}")
+  timeline.info("STATUS: #{object.user.id}")
+  timeline.info("STATUS: #{object.text}")
+  timeline.info("STATUS: #{object.id}")
+  timeline.info("\n\n\n")
 end
